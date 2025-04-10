@@ -3,6 +3,8 @@ defmodule SQLGlot do
   A `sqlglot` wrapper for Elixir.
   """
 
+  import Pythonx, only: [sigil_PY: 2]
+
   @type dialect() :: atom()
 
   Pythonx.uv_init(SQLGlot.Pyproject.pyproject())
@@ -14,25 +16,20 @@ defmodule SQLGlot do
           String.t()
         when options: [{:identify, boolean()} | {:pretty, boolean()}]
   def transpile(sql, from_dialect, to_dialect, opts \\ []) do
-    {result, _} =
-      Pythonx.eval(
-        """
-        import sqlglot
+    from_dialect = Atom.to_string(from_dialect)
+    to_dialect = Atom.to_string(to_dialect)
+    options = Enum.into(opts, %{})
 
-        options = options | {
-            'read': from_dialect.decode("utf-8"), 
-            'write': to_dialect.decode("utf-8")
-        }
+    ~PY"""
+    import sqlglot
 
-        sqlglot.transpile(sql.decode("utf-8"), **options)[0]
-        """,
-        %{
-          "sql" => sql,
-          "from_dialect" => Atom.to_string(from_dialect),
-          "to_dialect" => Atom.to_string(to_dialect),
-          "options" => Enum.into(opts, %{})
-        }
-      )
+    options = options | {
+        'read': from_dialect.decode("utf-8"), 
+        'write': to_dialect.decode("utf-8")
+    }
+
+    sqlglot.transpile(sql.decode("utf-8"), **options)[0]
+    """
 
     Pythonx.decode(result)
   end
