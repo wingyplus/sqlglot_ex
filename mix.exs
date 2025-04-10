@@ -20,7 +20,7 @@ defmodule SQLGlot.MixProject do
 
   defp deps do
     [
-      {:pythonx, "~> 0.4"},
+      {:pythonx, github: "livebook-dev/pythonx", branch: "main"},
       {:mneme, "~> 0.10", only: :test}
     ]
   end
