@@ -6,12 +6,22 @@ defmodule SQLGlot do
   @type dialect() :: atom()
   @type sql() :: String.t()
 
+  @pyproject """
+  [project]
+  name = "sqlglot-ex"
+  version = "0.0.0"
+  requires-python = "==3.13.*"
+  dependencies = [
+    "sqlglot[rs]==26.12.1"
+  ]
+  """
+
   @doc """
   Initialize SQLGlot environment.
   """
   def init() do
     try do
-      Pythonx.uv_init(SQLGlot.Pyproject.pyproject())
+      Pythonx.uv_init(@pyproject)
     rescue
       e in RuntimeError ->
         if Exception.message(e) == "Python interpreter has already been initialized" do
