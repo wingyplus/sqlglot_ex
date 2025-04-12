@@ -21,7 +21,7 @@ defmodule SQLGlot.MixProject do
   defp deps do
     [
       {:pythonx, "~> 0.4"},
-      {:mneme, "~> 0.10", only: :test}
+      {:mneme, "~> 0.10", only: [:dev, :test]}
     ]
   end
 end
