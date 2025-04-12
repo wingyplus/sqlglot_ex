@@ -6,7 +6,7 @@ defmodule SQLGlot.Pyproject do
     version = "0.0.0"
     requires-python = "==3.13.*"
     dependencies = [
-      "sqlglot==26.12.1"
+      "sqlglot[rs]==26.12.1"
     ]
     """
   end
