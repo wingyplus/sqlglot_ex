@@ -4,6 +4,7 @@ defmodule SQLGlot do
   """
 
   @type dialect() :: atom()
+  @type sql() :: String.t()
 
   @doc """
   Initialize SQLGlot environment.
@@ -24,8 +25,7 @@ defmodule SQLGlot do
   @doc """
   Transpile the SQL to another dialect.
   """
-  @spec transpile(sql :: String.t(), from_dialect :: dialect(), to_dialect :: dialect(), options) ::
-          String.t()
+  @spec transpile(sql(), from_dialect :: dialect(), to_dialect :: dialect(), options) :: sql()
         when options: [{:identify, boolean()} | {:pretty, boolean()}]
   def transpile(sql, from_dialect, to_dialect, opts \\ []) do
     script = """
@@ -48,5 +48,12 @@ defmodule SQLGlot do
 
     {result, _} = Pythonx.eval(script, bindings)
     Pythonx.decode(result)
+  end
+
+  @doc "Format the SQL code using `dialect` as a reference."
+  @spec format(sql(), dialect(), options) :: sql()
+        when options: [{:identify, boolean()} | {:pretty, boolean()}]
+  def format(sql, dialect, opts \\ []) do
+    transpile(sql, dialect, dialect, Keyword.put(opts, :pretty, true))
   end
 end
