@@ -24,4 +24,27 @@ defmodule SQLGlotTest do
                     :spark
                   )
   end
+
+  test "optimize/3" do
+    auto_assert """
+                SELECT
+                  (
+                    "x"."a" OR "x"."b" OR "x"."c"
+                  ) AND (
+                    "x"."a" OR "x"."b" OR "x"."d"
+                  ) AS "_col_0"
+                FROM "x" AS "x"
+                WHERE
+                  "x"."z" = CAST('2021-01-01' AS DATE) + INTERVAL '1' MONTH\
+                """ <-
+                  SQLGlot.optimize(
+                    """
+                    SELECT A OR (B OR (C AND D))
+                    FROM x
+                    WHERE Z = date '2021-01-01' + INTERVAL '1' month OR 1 = 0
+                    """,
+                    %{x: %{A: "INT", B: "INT", C: "INT", D: "INT", Z: "STRING"}},
+                    pretty: true
+                  )
+  end
 end

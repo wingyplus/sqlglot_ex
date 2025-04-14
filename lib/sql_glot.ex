@@ -30,8 +30,7 @@ defmodule SQLGlot do
       "options" => Enum.into(opts, %{})
     }
 
-    {result, _} = Pythonx.eval(script, bindings)
-    Pythonx.decode(result)
+    eval(script, bindings)
   end
 
   @doc "Format the SQL code using `dialect` as a reference."
@@ -39,5 +38,33 @@ defmodule SQLGlot do
         when options: [{:identify, boolean()} | {:pretty, boolean()}]
   def format(sql, dialect, opts \\ []) do
     transpile(sql, dialect, dialect, Keyword.put(opts, :pretty, true))
+  end
+
+  @doc """
+  Optimize the SQL code.
+  """
+  @spec format(sql(), map(), options) :: sql()
+        when options: [{:pretty, boolean()}]
+  def optimize(sql, schema \\ %{}, opts \\ []) do
+    script = """
+    import sqlglot
+    from sqlglot.optimizer import optimize
+
+    sql_ast = sqlglot.parse_one(sql.decode("utf-8"))
+    optimize(sql_ast, schema=schema).sql(**options)
+    """
+
+    bindings = %{
+      "sql" => sql,
+      "schema" => schema,
+      "options" => Enum.into(opts, %{})
+    }
+
+    eval(script, bindings)
+  end
+
+  defp eval(script, bindings) do
+    {result, _} = Pythonx.eval(script, bindings)
+    Pythonx.decode(result)
   end
 end
