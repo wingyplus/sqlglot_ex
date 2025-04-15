@@ -43,7 +43,7 @@ defmodule SQLGlot do
   @doc """
   Optimize the SQL code.
   """
-  @spec format(sql(), map(), options) :: sql()
+  @spec optimize(sql(), map(), options) :: sql()
         when options: [{:pretty, boolean()}]
   def optimize(sql, schema \\ %{}, opts \\ []) do
     script = """
